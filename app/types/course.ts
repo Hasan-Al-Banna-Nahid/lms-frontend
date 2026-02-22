@@ -1,3 +1,12 @@
+export interface Lesson {
+  id: string;
+  title: string;
+  content: string;
+  videoUrl: string;
+  order: number;
+  isPreview: boolean;
+}
+
 export interface Course {
   id: string;
   title: string;
@@ -7,11 +16,9 @@ export interface Course {
   price: number;
   isPaid: boolean;
   status: string;
-  category: {
-    name: string;
-  };
   instructor: {
     firstName: string;
     lastName: string;
   };
+  lessons: Lesson[];
 }

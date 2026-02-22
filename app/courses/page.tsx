@@ -3,7 +3,7 @@ import { CourseCard } from "@/app/components/shared/course-card";
 import { Course } from "@/app/types/course";
 
 export default async function CoursesPage() {
-  // Fetching data server-side (Google style for SEO)
+  // Fetching data server-side
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/course`, {
     cache: "no-store",
   });
