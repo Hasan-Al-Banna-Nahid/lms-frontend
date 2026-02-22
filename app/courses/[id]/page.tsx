@@ -12,6 +12,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { EnrollButton } from "@/app/components/course/enroll-button";
+import { cookies } from "next/headers";
 
 /**
  * Utility to extract YouTube ID
@@ -28,16 +29,42 @@ export default async function CourseDetailsPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  // 1. Await params for Next.js 15
   const { id } = await params;
 
-  const response = await fetch(
+  // 2. Access cookies for Authentication
+  const cookieStore = await cookies();
+  const token = cookieStore.get("access_token")?.value;
+
+  // 3. Fetch course data
+  const courseRes = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/course/${id}`,
-    { cache: "no-store" },
+    {
+      cache: "no-store",
+    },
   );
+  const courseResult = await courseRes.json();
+  const course = courseResult?.data;
 
-  const result = await response.json();
-  const course = result?.data;
+  // 4. FIX: Check enrollment status via Dashboard API if user is logged in
+  let isEnrolled = false;
+  if (token) {
+    const dashRes = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/dashboard`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      },
+    );
+    const dashData = await dashRes.json();
 
+    // Check if current course id exists in user's enrolledCourses list
+    isEnrolled = dashData?.data?.enrolledCourses?.some(
+      (item: any) => item.courseId === id,
+    );
+  }
+
+  // Handle 404
   if (!course) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
@@ -50,18 +77,14 @@ export default async function CourseDetailsPage({
 
   const previewLesson = course.lessons?.find((l: any) => l.isPreview);
   const videoId = previewLesson ? getYouTubeId(previewLesson.videoUrl) : null;
-
-  // Instructor Full Name
   const instructorName = `${course.instructor?.firstName} ${course.instructor?.lastName}`;
-
-  // Category Name (API তে category object থাকলে সেটি দেখাবে, না থাকলে 'General' দেখাবে)
   const categoryName = course.category?.name || "Web Development";
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pt-24 pb-20">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Column */}
+          {/* Left Column: Video & Main Info */}
           <div className="lg:col-span-2 space-y-8">
             {/* Video Player Section */}
             <div className="bg-black rounded-[32px] overflow-hidden shadow-2xl aspect-video relative group border-4 border-white">
@@ -79,6 +102,9 @@ export default async function CourseDetailsPage({
                     fill
                     className="object-cover opacity-60"
                   />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <PlayCircle className="h-16 w-16 text-white opacity-80" />
+                  </div>
                 </div>
               )}
             </div>
@@ -109,6 +135,10 @@ export default async function CourseDetailsPage({
                   <Clock className="h-4 w-4 text-indigo-500" />
                   <span>Last updated Feb 2026</span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-indigo-500" />
+                  <span>English / Bangla</span>
+                </div>
               </div>
 
               <p className="text-slate-600 leading-relaxed text-lg border-t pt-6">
@@ -137,7 +167,7 @@ export default async function CourseDetailsPage({
             </div>
           </div>
 
-          {/* Right Column (Sidebar) */}
+          {/* Right Column: Pricing & Curriculum */}
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-[32px] border border-slate-200 shadow-xl shadow-slate-200/50 sticky top-28">
               <div className="mb-6">
@@ -149,11 +179,15 @@ export default async function CourseDetailsPage({
                     $99.99
                   </span>
                 </div>
+                <p className="text-xs text-slate-400 font-bold mt-1 tracking-wide uppercase">
+                  Full Lifetime Access
+                </p>
               </div>
 
+              {/* FIX: Enrollment Button with Verified logic from Dashboard API */}
               <EnrollButton
                 courseId={course.id}
-                isAlreadyEnrolled={course.isEnrolled || false}
+                isAlreadyEnrolled={isEnrolled}
               />
 
               <div className="mt-10">
@@ -178,6 +212,11 @@ export default async function CourseDetailsPage({
                           {lesson.title}
                         </span>
                       </div>
+                      {lesson.isPreview && (
+                        <span className="text-[9px] font-black bg-indigo-600 text-white px-2 py-1 rounded">
+                          FREE
+                        </span>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -186,11 +225,11 @@ export default async function CourseDetailsPage({
               <div className="mt-8 pt-6 border-t border-slate-100 space-y-3">
                 <div className="flex items-center gap-2 text-sm font-medium text-slate-600">
                   <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                  <span>Full Lifetime Access</span>
+                  <span>Verified Course</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm font-medium text-slate-600">
                   <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                  <span>Verified Instructor</span>
+                  <span>Secure Payment</span>
                 </div>
               </div>
             </div>

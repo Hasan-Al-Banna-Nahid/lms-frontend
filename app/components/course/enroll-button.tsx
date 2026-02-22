@@ -2,11 +2,10 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, CheckCircle } from "lucide-react";
+import { Loader2, CheckCircle, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
 import axiosInstance from "@/app/lib/axios";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 
 interface EnrollButtonProps {
   courseId: string;
@@ -18,43 +17,22 @@ export const EnrollButton = ({
   isAlreadyEnrolled,
 }: EnrollButtonProps) => {
   const [loading, setLoading] = useState(false);
-  const [enrolled, setEnrolled] = useState(isAlreadyEnrolled);
   const router = useRouter();
 
   const handleEnroll = async () => {
-    const token = Cookies.get("access_token");
-
-    // ১. চেক ইউজার লগড ইন
-    if (!token) {
-      toast.error("Please login to enroll in this course");
-      return router.push("/login");
-    }
+    // Immediate check to prevent double clicking
+    if (isAlreadyEnrolled) return;
 
     setLoading(true);
-    const toastId = toast.loading("Processing your enrollment...");
-
     try {
       const response = await axiosInstance.post("/enroll", { courseId });
 
       if (response.data.success) {
-        toast.success("Enrolled successfully! Enjoy learning.", {
-          id: toastId,
-        });
-        setEnrolled(true);
-        router.refresh(); // রিফ্রেশ টু আপডেট স্টেট
+        toast.success("Welcome to the course!");
+        router.refresh(); // Triggers server-side data re-fetch
       }
     } catch (error: any) {
-      const message = error.response?.data?.message || "Enrollment failed";
-
-      // ২. যদি আগে থেকেই এনরোল থাকে
-      if (message.toLowerCase().includes("already enrolled")) {
-        setEnrolled(true);
-        toast.error("You are already enrolled in this course.", {
-          id: toastId,
-        });
-      } else {
-        toast.error(message, { id: toastId });
-      }
+      toast.error(error.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -63,21 +41,23 @@ export const EnrollButton = ({
   return (
     <Button
       onClick={handleEnroll}
-      disabled={loading || enrolled}
-      className={`w-full h-14 text-lg font-bold rounded-2xl shadow-xl transition-all active:scale-95 ${
-        enrolled
-          ? "bg-green-100 text-green-600 hover:bg-green-100 cursor-not-allowed border-2 border-green-200"
-          : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-100"
+      disabled={loading || isAlreadyEnrolled}
+      className={`w-full h-14 text-lg font-bold rounded-2xl transition-all duration-300 shadow-lg ${
+        isAlreadyEnrolled
+          ? "bg-emerald-50 text-emerald-600 border-2 border-emerald-100 cursor-default shadow-none"
+          : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200 active:scale-95"
       }`}
     >
       {loading ? (
-        <Loader2 className="animate-spin h-5 w-5" />
-      ) : enrolled ? (
+        <Loader2 className="animate-spin h-6 w-6" />
+      ) : isAlreadyEnrolled ? (
         <span className="flex items-center gap-2">
-          <CheckCircle className="h-5 w-5" /> Already Enrolled
+          <CheckCircle className="h-5 w-5" /> Access Granted
         </span>
       ) : (
-        "Enroll Now"
+        <span className="flex items-center gap-2">
+          Enroll Now <ArrowRight className="h-5 w-5" />
+        </span>
       )}
     </Button>
   );
