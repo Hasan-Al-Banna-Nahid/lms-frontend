@@ -3,6 +3,8 @@ import { Quicksand } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/app/providers/query-provider";
 import { Toaster } from "react-hot-toast";
+import { Suspense } from "react";
+import ProgressBar from "@/app/components/ProgressBar";
 const font = Quicksand({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -24,6 +26,9 @@ export default function RootLayout({
       <body className={` ${font.className} antialiased`}>
         <QueryProvider>
           <Toaster position="top-right" />
+          <Suspense fallback={null}>
+            <ProgressBar />
+          </Suspense>
           {children}
         </QueryProvider>{" "}
       </body>
