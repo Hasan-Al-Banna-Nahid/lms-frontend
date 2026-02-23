@@ -41,7 +41,11 @@ export const Navbar = () => {
       >
         {/* Brand Logo Section */}
         <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center space-x-2 group">
+          <Link
+            href="/"
+            prefetch={false}
+            className="flex items-center space-x-2 group"
+          >
             <div className="bg-indigo-600 p-1.5 rounded-lg transition-transform group-hover:rotate-12">
               <GraduationCap className="h-6 w-6 text-white" />
             </div>
@@ -55,6 +59,7 @@ export const Navbar = () => {
         <nav className="hidden md:flex items-center gap-6">
           {NAV_LINKS.map((link) => (
             <Link
+              prefetch={false}
               key={link.href}
               href={link.href}
               className="text-slate-300 text-sm font-semibold transition-all hover:text-white relative"
@@ -69,7 +74,7 @@ export const Navbar = () => {
           {isLoggedIn ? (
             // Authenticated State UI
             <div className="flex items-center gap-2">
-              <Link href="/dashboard">
+              <Link href="/dashboard" prefetch={false}>
                 <Button
                   variant="ghost"
                   className="text-slate-300 hover:text-white hover:bg-white/10 rounded-full flex items-center gap-2"
@@ -89,7 +94,7 @@ export const Navbar = () => {
           ) : (
             // Guest State UI
             <div className="flex items-center gap-2">
-              <Link href="/login" className="hidden xs:block">
+              <Link href="/login" prefetch={false} className="hidden xs:block">
                 <Button
                   variant="ghost"
                   className="text-slate-300 font-bold hover:text-white hover:bg-white/10 rounded-full"
@@ -97,7 +102,7 @@ export const Navbar = () => {
                   Log in
                 </Button>
               </Link>
-              <Link href="/register">
+              <Link href="/register" prefetch={false}>
                 <Button className="bg-indigo-600 hover:bg-indigo-700 text-sm font-bold rounded-full px-6 shadow-md shadow-indigo-500/20 transition-all active:scale-95">
                   Join Now
                 </Button>

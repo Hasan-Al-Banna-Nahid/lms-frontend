@@ -49,7 +49,9 @@ export default function Home() {
                   size="lg"
                   className="h-14 px-8 text-lg bg-indigo-600 hover:bg-indigo-700 shadow-xl w-full sm:w-auto"
                 >
-                  <Link href={"/courses"}>Explore Courses</Link>
+                  <Link href={"/courses"} prefetch={false}>
+                    Explore Courses
+                  </Link>
                 </Button>
                 <Button
                   size="lg"

@@ -143,6 +143,7 @@ export default function RegisterPage() {
             Already have an account?{" "}
             <Link
               href="/login"
+              prefetch={false}
               className="text-indigo-600 font-bold hover:underline"
             >
               Sign In

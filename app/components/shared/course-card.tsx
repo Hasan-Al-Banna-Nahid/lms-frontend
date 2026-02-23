@@ -10,7 +10,7 @@ import { User } from "lucide-react";
  */
 export const CourseCard = ({ course }: { course: Course }) => {
   return (
-    <Link href={`/courses/${course.id}`} className="group">
+    <Link href={`/courses/${course.id}`} prefetch={false} className="group">
       <div className="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
         {/* Thumbnail Container */}
         <div className="relative aspect-video w-full overflow-hidden">

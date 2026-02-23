@@ -91,6 +91,7 @@ export default async function GlobalCategoriesPage() {
                     </div>
                     <Link
                       href={`/categories/${cat.id}`}
+                      prefetch={false}
                       className="group flex items-center gap-2 text-sm font-black text-slate-900 hover:text-indigo-600 transition-all"
                     >
                       Browse All{" "}
@@ -106,6 +107,7 @@ export default async function GlobalCategoriesPage() {
                     {matchedCourses.map((course: any) => (
                       <Link
                         href={`/courses/${course.id}`}
+                        prefetch={false}
                         key={course.id}
                         className="group bg-white rounded-[32px] border border-slate-100 hover:border-transparent hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)] transition-all duration-500 overflow-hidden"
                       >

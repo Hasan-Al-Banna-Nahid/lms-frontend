@@ -130,6 +130,7 @@ export default async function CategoriesPage() {
                           </div>
                           <div className="flex gap-2">
                             <Link
+                              prefetch={false}
                               href={`/dashboard/courses/edit/${course.id}`}
                               className="flex-1 bg-slate-900 text-white py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-center hover:bg-indigo-600 transition-all"
                             >
