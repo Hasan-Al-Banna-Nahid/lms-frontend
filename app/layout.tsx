@@ -26,9 +26,7 @@ export default function RootLayout({
       <body className={` ${font.className} antialiased`}>
         <QueryProvider>
           <Toaster position="top-right" />
-          <Suspense fallback={null}>
-            <ProgressBar />
-          </Suspense>
+
           {children}
         </QueryProvider>{" "}
       </body>

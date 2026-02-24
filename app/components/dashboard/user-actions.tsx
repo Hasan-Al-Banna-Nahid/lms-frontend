@@ -16,7 +16,6 @@ export function UserActions({
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -36,7 +35,7 @@ export function UserActions({
       const url =
         type === "DELETE"
           ? `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`
-          : `${process.env.NEXT_PUBLIC_API_URL}/users/status/${userId}`;
+          : `${process.env.NEXT_PUBLIC_API_URL}/users/change-role/${userId}`;
 
       const res = await fetch(url, {
         method: type === "DELETE" ? "DELETE" : "PATCH",
@@ -47,8 +46,12 @@ export function UserActions({
         body: type === "ROLE" ? JSON.stringify({ role: value }) : undefined,
       });
 
-      if (res.ok) router.refresh();
-      else alert("Action failed");
+      if (res.ok) {
+        router.refresh();
+      } else {
+        const errorData = await res.json();
+        alert(errorData.message || "Action failed");
+      }
     } catch (err) {
       alert("Error occurred");
     } finally {
@@ -72,7 +75,9 @@ export function UserActions({
               }`}
             >
               <ShieldCheck size={16} />
-              <span className="text-[10px] font-black uppercase">Change</span>
+              <span className="text-[10px] font-black uppercase">
+                Change Role
+              </span>
               <ChevronDown
                 size={12}
                 className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
